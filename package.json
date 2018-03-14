@@ -1,6 +1,6 @@
 {
-  "name": "minimal-react-webpack-babel-setup",
-  "version": "1.0.0",
+  "name": "deeplearn-playground",
+  "version": "0.0.1-alpha",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -13,15 +13,27 @@
   "devDependencies": {
     "babel-core": "^6.23.1",
     "babel-loader": "^7.1.2",
+    "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-preset-react": "^6.23.0",
     "babel-preset-stage-2": "^6.22.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-polyfill": "^6.26.0",
     "react-hot-loader": "^3.1.3",
+    "standard": "*",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.4.1"
   },
   "dependencies": {
     "babel-preset-env": "^1.6.1",
+    "cytoscape": "^3.2.9",
+    "cytoscape-context-menus": "^3.0.5",
+    "cytoscape-dagre": "^2.2.0",
+    "cytoscape-edgehandles": "^3.2.2",
+    "cytoscape-popper": "^1.0.1",
+    "deeplearn": "^0.5.1",
+    "jquery": "^3.3.1",
     "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react-dom": "^16.2.0",
+    "styled-components": "^3.2.1"
   }
 }

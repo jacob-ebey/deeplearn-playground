@@ -2,6 +2,10 @@
   "presets": [
     "env",
     "react",
-    "stage-2"
+    "stage-2",
+    "es2015"
+  ],
+  "plugins": [
+    "transform-async-to-generator"
   ]
 }

@@ -1,9 +1,11 @@
-const webpack = require('webpack');
+const path = require('path')
+const webpack = require('webpack')
 
 module.exports = {
   entry: [
     'react-hot-loader/patch',
-    './src/index.js'
+    'babel-polyfill',
+    './src/index.jsx'
   ],
   module: {
     rules: [
@@ -18,7 +20,7 @@ module.exports = {
     extensions: ['*', '.js', '.jsx']
   },
   output: {
-    path: __dirname + '/dist',
+    path: path.join(__dirname, 'docs'),
     publicPath: '/',
     filename: 'bundle.js'
   },
@@ -26,7 +28,8 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin()
   ],
   devServer: {
-    contentBase: './dist',
+    contentBase: './docs',
     hot: true
-  }
-};
+  },
+  devtool: 'inline-source-map'
+}
