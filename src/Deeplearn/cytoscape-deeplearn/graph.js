@@ -39,7 +39,7 @@ export const compileGraph = (cy, modelArray) => () => {
   const targetOutputs = Number.parseInt(models[models.length - 1].outputs)
 
   const postOpSource = cy.nodes('node[type="post-op"]')
-  const postOpEndNode = cy.nodes('node[postopEnd="true"]')
+  const postOpEndNode = cy.nodes('node[postOpEnd="true"]')
 
   let postops
   if (postOpSource.length && postOpEndNode.length) {
@@ -76,11 +76,21 @@ export const compileGraph = (cy, modelArray) => () => {
       })
     },
 
-    async train (input, target, itterations = 1000, log = 100, optimizer = new SGDOptimizer(0.1)) {
-      const inputTensor = tensor2d(input, [input.length, sourceInputs])
-      const targetTensor = tensor2d(target, [target.length, targetOutputs])
+    async train (input, target, iterations = 1000, batchSize = 20, log = 100, optimizer = new SGDOptimizer(0.1)) {
+      let currentBatch = 0
       let cost
-      for (let i = 0; i < itterations; i++) {
+      for (let i = 0; i < iterations; i++) {
+        const currentInput = input.slice(currentBatch * batchSize, (currentBatch + 1) * batchSize)
+        const currentTarget = target.slice(currentBatch * batchSize, (currentBatch + 1) * batchSize)
+
+        currentBatch += 1
+        if (currentBatch * batchSize >= input.length) {
+          currentBatch = 0
+        }
+
+        const inputTensor = tensor2d(currentInput, [currentInput.length, sourceInputs])
+        const targetTensor = tensor2d(currentTarget, [currentTarget.length, targetOutputs])
+
         cost = optimizer.minimize(() => {
           return calculateCost(targetTensor, sample(inputTensor))
         }, true)
@@ -92,7 +102,7 @@ export const compileGraph = (cy, modelArray) => () => {
         await nextFrame()
       }
 
-      console.log(`cost[${itterations}] = ${await cost.getValuesAsync()}`)
+      console.log(`cost[${iterations}] = ${await cost.getValuesAsync()}`)
 
       return cost.data()
     }

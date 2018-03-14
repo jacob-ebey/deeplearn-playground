@@ -7,6 +7,8 @@ import popper from 'cytoscape-popper'
 import jquery from 'jquery'
 
 import deeplean, { defaultStyles } from './cytoscape-deeplearn/deeplearn'
+import { datasets } from './datasets'
+// import { defaultModel } from './defaultModel'
 
 contextMenus(cytoscape, jquery)
 deeplean(cytoscape)
@@ -22,6 +24,7 @@ export class UX extends React.Component {
     this._compileGraph = this._compileGraph.bind(this)
     this._train = this._train.bind(this)
     this._sampleGraph = this._sampleGraph.bind(this)
+    this._changeDataset = this._changeDataset.bind(this)
 
     this.graphRef = undefined
     this.cy = undefined
@@ -29,24 +32,36 @@ export class UX extends React.Component {
 
     this.state = {
       cost: 0,
-      training: false
+      training: false,
+      selectedDataset: 0
     }
   }
 
   componentDidMount () {
     this.cy = cytoscape(createCytoscapeOptions(this.graphRef))
+    this.cy.layout({ name: 'dagre' }).run()
+    this.cy.fit()
     this.network = this.cy.deeplearn()
   }
 
   render () {
-    const { training } = this.state
+    const { training, selectedDataset } = this.state
 
     return (
       <div className='grow'>
         <div>
+          <select onChange={this._changeDataset} value={selectedDataset}>
+            {
+              datasets.map((d, i) => (
+                <option key={i} value={i}>{d.name}</option>
+              ))
+            }
+          </select>
           <button disabled={training} onClick={this._compileGraph}>Compile Graph</button>
-          <button onClick={this._train}>Train</button>
+          <button disabled={training} onClick={this._train}>Train</button>
           <button onClick={this._sampleGraph}>Sample</button>
+          <span>Inputs: {datasets[selectedDataset].inputCount}</span>
+          <span>Outputs: {datasets[selectedDataset].outputCount}</span>
         </div>
 
         <div className='grow' ref={this._getGraphRef} />
@@ -63,19 +78,30 @@ export class UX extends React.Component {
   }
 
   async _train () {
-    await this.graph.train(
-      [[0, 0], [0, 1], [1, 0], [1, 1]],
-      [[0], [1], [1], [0]]
-    )
+    this.setState({ training: true })
+    try {
+      await this.graph.train(
+        datasets[this.state.selectedDataset].inputs,
+        datasets[this.state.selectedDataset].outputs
+      )
+    } finally {
+      this.setState({ training: false })
+    }
   }
 
   _sampleGraph () {
     if (this.graph) {
-      console.log(this.graph.sample([0, 0]))
-      console.log(this.graph.sample([1, 0]))
-      console.log(this.graph.sample([0, 1]))
-      console.log(this.graph.sample([1, 1]))
+      for (let i = 0; i < 4; i++) {
+        const result = this.graph.sample(datasets[this.state.selectedDataset].inputs[i])
+        console.log(`Expected: ${JSON.stringify(datasets[this.state.selectedDataset].outputs[i])}`)
+        console.log(`     Got: ${JSON.stringify(Object.keys(result).map((k) => result[k]))}`)
+      }
     }
+  }
+
+  _changeDataset (e) {
+    this.setState({ selectedDataset: e.target.value })
+    console.log(datasets[e.target.value].inputs[0])
   }
 }
 

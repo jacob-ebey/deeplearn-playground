@@ -6,7 +6,7 @@ class PropsComponent extends React.Component {
     super()
     this._onChange = this._onChange.bind(this)
 
-    const { end, postopEnd, id, label, type, model, ...rest } = props.node.data()
+    const { end, postOpEnd, id, label, type, model, ...rest } = props.node.data()
 
     this.state = Object.getOwnPropertyNames(rest).reduce((p, key) => {
       p[key] = rest[key]
@@ -16,7 +16,7 @@ class PropsComponent extends React.Component {
 
   render () {
     const { node } = this.props
-    const { end, postopEnd, id, label, type, ...rest } = node.data()
+    const { end, postOpEnd, id, label, type, ...rest } = node.data()
 
     return (
       <div className='white'>

@@ -19,8 +19,8 @@ export function createContextMenuOptions (cy, models) {
         selector: 'node',
         onClickFunction: (e) => {
           if (e.target.data('type') !== 'data-source' && e.target.data('type') !== 'post-op') {
-            cy.nodes().data('postopEnd', 'false')
-            e.target.data('postopEnd', 'true')
+            cy.nodes().data('postOpEnd', 'false')
+            e.target.data('postOpEnd', 'true')
           }
         }
       },

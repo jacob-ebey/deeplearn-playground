@@ -25,8 +25,8 @@ export class FullyConnectedLayer extends AbstractModel {
   }
 
   createModel (inputs, params = defaultParams) {
-    const weights = variable(initializeWeights([inputs, params.outputs], inputs))
-    const bias = variable(scalar(0))
+    const weights = variable(initializeWeights([inputs, params.outputs], inputs), true)
+    const bias = variable(scalar(0), true)
 
     return {
       exec: (inputTensor) => {
@@ -38,7 +38,8 @@ export class FullyConnectedLayer extends AbstractModel {
 
         return weighted.sigmoid()
       },
-      outputs: params.outputs
+      outputs: params.outputs,
+      trainable: [weights, bias]
     }
   }
 }
