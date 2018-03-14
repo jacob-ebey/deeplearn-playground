@@ -1,3 +1,4 @@
+import { BooleanClip } from './BooleanClip'
 import { Clip } from './Clip'
 import { DataSource } from './DataSource'
 import { FullyConnectedLayer } from './FullyConnectedLayer'
@@ -8,6 +9,7 @@ export default [
   new DataSource(),
   new PostOp(),
   new FullyConnectedLayer(),
+  new BooleanClip(),
   new Clip(),
   new Softmax()
 ]
