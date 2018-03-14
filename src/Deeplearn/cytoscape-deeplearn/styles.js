@@ -39,7 +39,7 @@ export const defaultStyles = [
     }
   },
   {
-    selector: 'node[end="true"], node[postopEnd="true"]',
+    selector: 'node[end="true"], node[postOpEnd="true"]',
     style: {
       'background-color': 'blue'
     }
