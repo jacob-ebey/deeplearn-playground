@@ -91,9 +91,9 @@ export class UX extends React.Component {
 
   _sampleGraph () {
     if (this.graph) {
-      for (let i = 0; i < 4; i++) {
-        const result = this.graph.sample(datasets[this.state.selectedDataset].inputs[i])
-        console.log(`Expected: ${JSON.stringify(datasets[this.state.selectedDataset].outputs[i])}`)
+      for (let i = 0; i < datasets[this.state.selectedDataset].testInputs.length; i++) {
+        const result = this.graph.sample(datasets[this.state.selectedDataset].testInputs[i])
+        console.log(`Expected: ${JSON.stringify(datasets[this.state.selectedDataset].testOutputs[i])}`)
         console.log(`     Got: ${JSON.stringify(Object.keys(result).map((k) => result[k]))}`)
       }
     }
