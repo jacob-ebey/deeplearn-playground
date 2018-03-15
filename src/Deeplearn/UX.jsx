@@ -24,7 +24,7 @@ export class UX extends React.Component {
     this._compileGraph = this._compileGraph.bind(this)
     this._train = this._train.bind(this)
     this._sampleGraph = this._sampleGraph.bind(this)
-    this._changeDataset = this._changeDataset.bind(this)
+    this._changeValue = this._changeValue.bind(this)
 
     this.graphRef = undefined
     this.cy = undefined
@@ -33,7 +33,10 @@ export class UX extends React.Component {
     this.state = {
       cost: 0,
       training: false,
-      selectedDataset: 0
+      selectedDataset: 0,
+      iterations: 1000,
+      batchSize: 10,
+      logEvery: 100
     }
   }
 
@@ -45,23 +48,31 @@ export class UX extends React.Component {
   }
 
   render () {
-    const { training, selectedDataset } = this.state
+    const { training, selectedDataset, iterations, batchSize, logEvery } = this.state
 
     return (
       <div className='grow'>
         <div>
-          <select onChange={this._changeDataset} value={selectedDataset}>
+          <button disabled={training} onClick={this._compileGraph}>Compile Graph</button>
+          <button disabled={training} onClick={this._train}>Train</button>
+          <button onClick={this._sampleGraph}>Sample</button>
+          <span>&nbsp;Inputs: {datasets[selectedDataset].inputCount}</span>
+          <span>Outputs: {datasets[selectedDataset].outputCount}</span>
+          <br />
+          <span>Dataset: </span>
+          <select onChange={this._changeValue('selectedDataset')} value={selectedDataset}>
             {
               datasets.map((d, i) => (
                 <option key={i} value={i}>{d.name}</option>
               ))
             }
           </select>
-          <button disabled={training} onClick={this._compileGraph}>Compile Graph</button>
-          <button disabled={training} onClick={this._train}>Train</button>
-          <button onClick={this._sampleGraph}>Sample</button>
-          <span>Inputs: {datasets[selectedDataset].inputCount}</span>
-          <span>Outputs: {datasets[selectedDataset].outputCount}</span>
+          <span>Iterations: </span>
+          <input key='number' value={iterations} onChange={this._changeValue('iterations')} />
+          <span>Batch Size: </span>
+          <input type='number' value={batchSize} onChange={this._changeValue('batchSize')} />
+          <span>Log Every: </span>
+          <input type='number' value={logEvery} onChange={this._changeValue('logEvery')} />
         </div>
 
         <div className='grow' ref={this._getGraphRef} />
@@ -78,11 +89,16 @@ export class UX extends React.Component {
   }
 
   async _train () {
+    const { iterations, batchSize, logEvery } = this.state
+
     this.setState({ training: true })
     try {
       await this.graph.train(
         datasets[this.state.selectedDataset].inputs,
-        datasets[this.state.selectedDataset].outputs
+        datasets[this.state.selectedDataset].outputs,
+        iterations,
+        batchSize,
+        logEvery
       )
     } finally {
       this.setState({ training: false })
@@ -99,9 +115,10 @@ export class UX extends React.Component {
     }
   }
 
-  _changeDataset (e) {
-    this.setState({ selectedDataset: e.target.value })
-    console.log(datasets[e.target.value].inputs[0])
+  _changeValue (key) {
+    return (e) => {
+      this.setState({ [key]: e.target.value })
+    }
   }
 }
 

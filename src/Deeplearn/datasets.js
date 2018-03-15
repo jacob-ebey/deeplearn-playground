@@ -1,7 +1,6 @@
 import mnist from 'mnist'
 
 const set = mnist.set(2000, 10)
-console.log(set)
 
 const filterSet = (subset) => {
   return subset.filter(c => c && Array.isArray(c.input) && Array.isArray(c.output)).reduce((p, c) => {

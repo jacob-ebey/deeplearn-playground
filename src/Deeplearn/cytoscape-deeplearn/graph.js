@@ -1,7 +1,6 @@
 import {
   SGDOptimizer,
   add,
-  nextFrame,
   scalar,
   tensor2d,
   tidy
@@ -77,34 +76,33 @@ export const compileGraph = (cy, modelArray) => () => {
     },
 
     async train (input, target, iterations = 1000, batchSize = 20, log = 100, optimizer = new SGDOptimizer(0.1)) {
-      let currentBatch = 0
-      let cost
-      for (let i = 0; i < iterations; i++) {
-        const currentInput = input.slice(currentBatch * batchSize, (currentBatch + 1) * batchSize)
-        const currentTarget = target.slice(currentBatch * batchSize, (currentBatch + 1) * batchSize)
+      return new Promise((resolve) => {
+        let currentBatch = 0
+        for (let i = 0; i < iterations; i++) {
+          const currentInput = input.slice(currentBatch * batchSize, (currentBatch + 1) * batchSize)
+          const currentTarget = target.slice(currentBatch * batchSize, (currentBatch + 1) * batchSize)
 
-        currentBatch += 1
-        if (currentBatch * batchSize >= input.length) {
-          currentBatch = 0
+          currentBatch += 1
+          if (currentBatch * batchSize >= input.length) {
+            currentBatch = 0
+          }
+
+          tidy(() => {
+            const inputTensor = tensor2d(currentInput, [currentInput.length, sourceInputs])
+            const targetTensor = tensor2d(currentTarget, [currentTarget.length, targetOutputs])
+
+            const cost = optimizer.minimize(() => {
+              return calculateCost(targetTensor, sample(inputTensor))
+            }, true)
+
+            if (i % log === 0 || i === iterations - 1) {
+              console.log(`cost[${i}] = ${cost.getValues()}`)
+            }
+          })
         }
 
-        const inputTensor = tensor2d(currentInput, [currentInput.length, sourceInputs])
-        const targetTensor = tensor2d(currentTarget, [currentTarget.length, targetOutputs])
-
-        cost = optimizer.minimize(() => {
-          return calculateCost(targetTensor, sample(inputTensor))
-        }, true)
-
-        if (i % log === 0) {
-          console.log(`cost[${i}] = ${await cost.getValuesAsync()}`)
-        }
-
-        await nextFrame()
-      }
-
-      console.log(`cost[${iterations}] = ${await cost.getValuesAsync()}`)
-
-      return cost.data()
+        resolve()
+      })
     }
   }
 }
